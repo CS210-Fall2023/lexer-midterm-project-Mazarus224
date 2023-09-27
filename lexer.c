@@ -16,7 +16,7 @@ int main(int argc,char* argv[])
     int p = 0;
     int KWindex = 0;
     fp = fopen(argv[1], "r");
-    char farray[256];
+    char farray[4016];
     char KeyWord[256];
     char KeyWords[40][10] = {"accessor","and","array","begin","bool","case","character","constant","else","elsif","end",
                             "exit","function","if","in","integer","interface","is","loop","module","mutator","natural",
@@ -28,6 +28,7 @@ int main(int argc,char* argv[])
     {    
         type = 0;
         KWindex = 0;
+        
         for(int i = 0; i < 256; ++i)
         {
             KeyWord[i] = 0;
@@ -57,11 +58,11 @@ int main(int argc,char* argv[])
                 fseek(fp, -1, SEEK_CUR);
             }
         }
+
         if(type == 0)
         {
             for (int i = 0; i < 17; ++i)
             {   
-                //printf("%c = %c\n", farray[p], operators[i]);
                 if(farray[p] == operators[i] && type == 0)
                 {
                     type = 5;
@@ -69,14 +70,17 @@ int main(int argc,char* argv[])
                 }
             }
         }
+
         if((farray[p] == '\n' || farray[p] == '\0' || farray[p] == ' ') && type == 0)
         {
             type = nl;
         }
+
         if(farray[p] == '"' && type == 0)
         {
             type = string;
         }
+
         if(farray[p] > 96 && farray[p] < 123 && type == 0)
         {
             p2 = p;
@@ -91,13 +95,12 @@ int main(int argc,char* argv[])
                 ++KWindex;
                 KeyWord[KWindex] = farray[p2];
                 ++p2;
-                //printf("check\n");
                 farray[p2] = fgetc(fp);
                 ++offset;
                 
             }
             
-            //fseek(fp, -1, SEEK_CUR);
+            fseek(fp, -1, SEEK_CUR);
             for(int i = 0; i < 39; ++i)
             {
                 if(strcmp(KeyWord, KeyWords[i]) == 0)
@@ -105,22 +108,20 @@ int main(int argc,char* argv[])
                     type = keyword;
                     break;
                 }
-            }        
+            }
+
             if(type == 0)
             {
                 type = 6;
+                fseek(fp, 1, SEEK_CUR);
                 while((farray[p2] > 96 && farray[p2] < 123) || (farray[p2] > 47 && farray[p2] < 58) || farray[p2] == '_')
                 {
                     ++KWindex;
                     KeyWord[KWindex] = farray[p2];
                     ++p2;
-                    //printf("check\n");
                     farray[p2] = fgetc(fp);
-                    ++offset;
-                    
+                    ++offset;   
                 }
-
-                //offset *= -1;
                 fseek(fp, -1, SEEK_CUR);
             }
         }
@@ -138,14 +139,13 @@ int main(int argc,char* argv[])
                     if(farray[(p)] == '/')
                     {
                         printf("%c", farray[p]);
-                        printf(" (Comment)\n");
+                        printf(" (comment)\n");
                         p++;
                         break;
-                    }
-                    
-                    
+                    } 
                 }
                 break;
+
             case 2:
                 while(1)
                 {
@@ -158,37 +158,40 @@ int main(int argc,char* argv[])
                         printf(" (string)\n");
                         p++;
                         break;
-                    }
-                    
-                    
+                    } 
                 }
                 break;
+
             case 3:
                 printf("%s",KeyWord);
-                printf(" (KeyWord)\n");    
+                printf(" (keyword)\n");    
                 break;
+
             case 4:
                 printf("%c%c", op[0],op[1]);
                 printf(" (operator)\n");
                 break; 
+
             case 5:
-                printf("%c ",farray[p]);
+                printf("%c",farray[p]);
                 printf(" (operator)\n");
                 break;
+
             case 6:
-                printf("%s (identifer)\n",KeyWord);
+                printf("%s (identifier)\n",KeyWord);
                 break;
+
             case 7:
-                printf("%c (numeric)\n", farray[p]);
-                break;           
+                printf("%c (numeric literal)\n", farray[p]);
+                break;  
+
             case 0:
                 printf("\nUnknow\n");
                 break;
+
             case -1:
                 break;
         } 
-
     }
-
 return 0;
 }   
