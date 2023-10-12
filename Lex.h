@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 int findnum(int t, int in, char a[]);
 int findcomment(int t, int in, char a[]);

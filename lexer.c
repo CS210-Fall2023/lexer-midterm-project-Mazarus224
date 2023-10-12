@@ -3,9 +3,11 @@
 #include "Lex.h"
 
 
+
 int main(int argc,char* argv[])
 {
-    FILE *fp; //file opbject 
+    FILE *fp; //file object 
+    FILE *ff; //output file object
     int p2 = 0; //second array index
     int p = 0;//main array index
     int type = 0;//switch control
@@ -15,6 +17,7 @@ int main(int argc,char* argv[])
     
     int KWindex = 0; //keyword array index
     fp = fopen(argv[1], "r");//open file
+    ff = fopen("output.txt", "w");
     char farray[4016]; //main array
     char KeyWord[256]; //array to search for keywords
     //array of keywords
@@ -113,13 +116,13 @@ int main(int argc,char* argv[])
             case 1:
                 while(1)
                 {
-                    printf("%c", farray[p]);
+                    fprintf(ff,"%c", farray[p]);
                     p++;
                     farray[(p)] = fgetc(fp);
                     if(farray[(p)] == '/')
                     {
-                        printf("%c", farray[p]);
-                        printf(" (comment)\n");
+                        fprintf(ff,"%c", farray[p]);
+                        fprintf(ff," (comment)\n");
                         p++;
                         break;
                     } 
@@ -129,13 +132,13 @@ int main(int argc,char* argv[])
             case 2:
                 while(1)
                 {
-                    printf("%c", farray[p]);
+                    fprintf(ff,"%c", farray[p]);
                     p++;
                     farray[(p)] = fgetc(fp);
                     if(farray[(p)] == '"')
                     {
-                        printf("%c", farray[p]);
-                        printf(" (string)\n");
+                        fprintf(ff,"%c", farray[p]);
+                        fprintf(ff," (string)\n");
                         p++;
                         break;
                     } 
@@ -143,46 +146,48 @@ int main(int argc,char* argv[])
                 break;
 
             case 3:
-                printf("%s",KeyWord);
-                printf(" (keyword)\n");    
+                fprintf(ff,"%s",KeyWord);
+                fprintf(ff," (keyword)\n");    
                 break;
 
             case 4:
-                printf("%c%c", op[0],op[1]);
-                printf(" (operator)\n");
+                fprintf(ff,"%c%c", op[0],op[1]);
+                fprintf(ff," (operator)\n");
                 break; 
 
             case 5:
-                printf("%c",farray[p]);
-                printf(" (operator)\n");
+                fprintf(ff,"%c",farray[p]);
+                fprintf(ff," (operator)\n");
                 break;
 
             case 6:
-                printf("%s (identifier)\n",KeyWord);
+                fprintf(ff,"%s (identifier)\n",KeyWord);
                 break;
 
             case 7:
                 farray[p+1]= fgetc(fp);
                 farray[p+2]= fgetc(fp);
-                 if((farray[p+1]) == "." && (farray[p+2] > 47 && farray[p+2] < 58))
+                 if((farray[p+1]) == '.' && (farray[p+2] > 47 && farray[p+2] < 58))
                  {
-                     printf("%c%c%c", farray[p], farray[p+1], farray[p+2]);
+                     fprintf(ff,"%c%c%c", farray[p], farray[p+1], farray[p+2]);
                      break;
                  }
                  else
                  {
-                     printf("%c (numeric literal)\n", farray[p]);
+                     fprintf(ff,"%c (numeric literal)\n", farray[p]);
                      fseek(fp, -2, SEEK_CUR);
                      break;
                  }  
 
             case 0:
-                printf("\nUnknow\n");
+                fprintf(ff,"\nUnknow\n");
                 break;
 
             case -1:
                 break;
         } 
     }
+    fclose(fp);
+    fclose(ff);
 return 0;
 }   
